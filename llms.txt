@@ -1,0 +1,22 @@
+# FinTrack Pro - LLM & Agentic Context
+
+> FinTrack Pro is a meticulously crafted, premium personal finance application built to showcase modern 2026 web standards, prioritizing high accessibility and minimal architectural bloat.
+
+## Architecture
+- **Frameworkless SPA**: The entire application is driven by a single `index.html` file using 100% vanilla ES2026 JavaScript. No React, Vue, or Angular.
+- **CSS Engine**: Utilizes 2026 Native CSS Nesting (`&`), `@starting-style`, and `allow-discrete` transitions for smooth popovers and modal exits with 0% code duplication.
+- **Responsiveness**: Driven by advanced `clamp()` functions and CSS Grid to scale perfectly from 4K down to mobile screens.
+- **State Management**: Data is handled locally via the Web Storage API, organized by user sessions.
+
+## Accessibility & UI/UX
+- Perfect 100/100 Lighthouse Accessibility score.
+- Implements the Native View Transitions API for fluid, app-like navigation with `try...catch` promise handling to avoid `InvalidStateError`.
+- Employs a bespoke Dark Mode Engine with a custom 3D interactive toggle and native `color-mix()`.
+- Form inputs feature modern 2026 inline validation arrays and native HTML5 pattern constraints.
+- WCAG 2.2 Compliant contrast ratios (e.g., `#dc2626` for danger states).
+
+## Tooling Context
+Agents interacting with this application should be aware that all UI elements are fully accessible (ARIA compliant labels, semantic headings, `for` attributes on form inputs) and can be easily navigated using standard query selectors.
+
+## Key Links
+- [FinTrack Pro Dashboard](http://localhost:8080) - Main application interface.

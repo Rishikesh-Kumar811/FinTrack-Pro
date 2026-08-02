@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTrack Pro | Premium Personal Finance & Expense Tracker</title>
+
+    <meta name="title" content="FinTrack Pro | Premium Personal Finance & Expense Tracker">
+    <meta name="description" content="Take control of your finances with FinTrack Pro. Track income, monitor expenses, and visualize your cash flow with our modern, secure, and intuitive dashboard.">
+    <meta name="keywords" content="finance tracker, expense manager, budget dashboard, personal finance, money management">
+    <meta name="author" content="FinTrack Pro">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="theme-color" content="#4f46e5">
+
+    <link rel="canonical" href="https://fintrackpro.com/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fintrackpro.com/">
+    <meta property="og:title" content="FinTrack Pro | Premium Personal Finance & Expense Tracker">
+    <meta property="og:description" content="Take control of your finances with FinTrack Pro. Track income, monitor expenses, and visualize your cash flow with our modern, secure, and intuitive dashboard.">
+    <meta property="og:image" content="https://fintrackpro.com/assets/og-image.jpg">
+    <meta property="og:site_name" content="FinTrack Pro">
+    <meta property="og:locale" content="en_US">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://fintrackpro.com/">
+    <meta name="twitter:title" content="FinTrack Pro | Premium Personal Finance & Expense Tracker">
+    <meta name="twitter:description" content="Take control of your finances with FinTrack Pro. Track income, monitor expenses, and visualize your cash flow with our modern, secure, and intuitive dashboard.">
+    <meta name="twitter:image" content="https://fintrackpro.com/assets/og-image.jpg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "FinTrack Pro",
+      "url": "https://fintrackpro.com/",
+      "description": "Premium personal finance dashboard for tracking income and expenses.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+</head>
+<body>
+    <div id="app">
+        <div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;color:#6b7280;font-size:1.1rem;font-weight:500;">
+            <div style="animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;">Loading FinTrack Pro...</div>
+        </div>
+        <style>@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }</style>
+    </div>
+
+    <script type="module">
+
+        document.addEventListener('pointerdown', (e) => {
+            const isInteractive = e.target.closest('input, textarea, select, button, .custom-switch');
+            if (!isInteractive && window.getSelection().toString().length > 0) {
+                window.getSelection().removeAllRanges();
+            }
+        });
+
+        const $ = (id) => document.getElementById(id);
+        const AppState = {
+            users: JSON.parse(localStorage.getItem('fintrack_users')) || [],
+            session: localStorage.getItem('fintrack_session') || null, 
+            transactions: JSON.parse(localStorage.getItem('fintrack_tx')) || [],
+            activeFilter: 'All',
+            chartInstance: null
+        };
+        const saveUsers = () => localStorage.setItem('fintrack_users', JSON.stringify(AppState.users));
+        const saveTxs = () => localStorage.setItem('fintrack_tx', JSON.stringify(AppState.transactions));
+
+        function getCurrentUser() {
+            return AppState.users.find(u => u.email === AppState.session) ?? null;
+        }
+
+        function getSettings() {
+            const user = getCurrentUser();
+            return user?.settings ?? { currency: '$', dark: false };
+        }
+
+        function getUserTransactions() {
+            return AppState.transactions.filter(tx => tx.userEmail === AppState.session);
+        }
+
+        function loadDependencies(callback) {
+            const fontLink = document.createElement('link');
+            fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
+            fontLink.rel = 'stylesheet';
+            document.head.appendChild(fontLink);
+
+            const chartScript = document.createElement('script');
+            chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+            chartScript.onload = callback;
+            chartScript.onerror = () => {
+                console.warn('Chart.js failed to load. Continuing to initialize application without charts.');
+                callback(); 
+            };
+            document.head.appendChild(chartScript);
+        }
+
+        function injectCSS() {
+            const style = document.createElement('style');
+            style.textContent = `
+                body { -webkit-user-select: none; user-select: none; }
+                h1, h2, h3, h4, h5, h6, p, span, label, th, td, input, textarea, select { -webkit-user-select: text; user-select: text; }
+                h1, h2, h3, h4, h5, h6 { text-wrap: balance; }
+                
+                ::view-transition-old(root) {
+                    animation: fade-out 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+                               scale-down 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+                }
+                ::view-transition-new(root) {
+                    animation: fade-in 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+                               scale-up 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+                }
+                @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+                @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+                @keyframes scale-up { from { transform: scale(0.97) translateY(10px); } to { transform: scale(1) translateY(0); } }
+                @keyframes scale-down { from { transform: scale(1) translateY(0); } to { transform: scale(0.97) translateY(-10px); } }
+                
+                button, .btn, .custom-switch, a, .nav-item, .nav-item span, .theme-toggle-wrapper, .theme-toggle-wrapper div { -webkit-user-select: none !important; user-select: none !important; }
+
+                :root {
+                    interpolate-size: allow-keywords;
+                    --bg: #f3f4f6; 
+                    --card-bg: #ffffff; 
+                    --text-main: #111827;
+                    --text-muted: #374151; 
+                    --primary: #4338ca; 
+                    --primary-hover: color-mix(in srgb, var(--primary) 85%, black);
+                    --income: #059669; 
+                    --expense: #b91c1c; 
+                    --border: #e5e7eb;
+                    --sidebar-bg: #1e1b4b; 
+                    --sidebar-text: #e0e7ff;
+                    --sidebar-active: color-mix(in srgb, white 10%, transparent);
+                    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                }
+                body.dark-mode {
+                    --bg: #111827; 
+                    --card-bg: #1f2937; 
+                    --text-main: #f9fafb;
+                    --text-muted: #d1d5db; 
+                    --income: #10b981; 
+                    --expense: #ef4444; 
+                    --primary: #4f46e5;
+                    --border: #374151;
+                    --sidebar-bg: #0f172a; 
+                    --sidebar-text: #f8fafc;
+                    --sidebar-active: color-mix(in srgb, white 5%, transparent);
+
+                    & .form-group select { background-image: url('data:image/svg+xml;utf8,<svg fill="%239ca3af" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); }
+                    & tbody tr:hover { background: color-mix(in srgb, var(--primary) 10%, transparent); }
+                    & .custom-switch { background: #1e1b4b; box-shadow: inset 0 0.1875em 0.375em rgba(0,0,0,0.4); }
+                    & .switch-circle { transform: translateX(2em); }
+                    & .icon-sun { opacity: 0; transform: scale(0.4) rotate(90deg) translateY(1.25em); }
+                    & .icon-moon { opacity: 1; transform: scale(1) rotate(0); }
+                    & .switch-bg-clouds { opacity: 0; transform: translateY(0.625em) scale(0.9); }
+                    & .switch-bg-stars { opacity: 1; transform: translateY(0); }
+                }
+                * { 
+                    box-sizing: border-box; margin: 0; padding: 0; 
+                    scrollbar-width: none; 
+                    -ms-overflow-style: none; 
+                }
+                *::-webkit-scrollbar { display: none;  }
+                html, body { width: 100vw; overflow-x: hidden; }
+                html { color-scheme: light dark; }
+                body { text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
+                body { 
+                    font-family: 'Inter', sans-serif; 
+                    background: var(--bg); 
+                    color: var(--text-main); 
+                    transition: background 0.4s ease, color 0.4s ease; 
+                    min-height: 100vh;
+                }
+                
+                #app { min-height: calc(100vh / var(--scale, 1)); transition: transform 0.2s ease; width: 100%; overflow: hidden; }
+                .hidden { display: none !important; }
+
+                ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.3s; }
+
+                #dashboard-layout {
+                    display: grid;
+                    grid-template-areas: "sidebar main";
+                    grid-template-columns: 260px 1fr;
+                    height: 100%;
+                    overflow: hidden;
+                }
+
+                .sidebar {
+                    grid-area: sidebar;
+                    background: var(--sidebar-bg);
+                    color: var(--sidebar-text);
+                    padding: 24px 20px;
+                    display: flex;
+                    flex-direction: column;
+                    border-right: 1px solid color-mix(in srgb, white 5%, transparent);
+                    position: sticky;
+                    top: 0;
+                    height: 100%;
+                    overflow-y: auto;
+                    transition: background 0.4s ease;
+                }
+                .nav-brand { font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; cursor: pointer; white-space: nowrap; }
+                
+                .nav-links { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+                .nav-links a { 
+                    color: var(--sidebar-text); 
+                    text-decoration: none; 
+                    font-weight: 500; 
+                    padding: 12px 16px; 
+                    border-radius: 8px; 
+                    cursor: pointer; 
+                    opacity: 0.7; 
+                    transition: all 0.2s; 
+                    white-space: nowrap;
+                    &:hover { opacity: 1; background: var(--sidebar-active); }
+                    &.active { opacity: 1; background: var(--sidebar-active); font-weight: 600; }
+                }
+                
+                .sidebar-bottom { margin-top: auto; }
+
+                .main-wrapper {
+                    grid-area: main;
+                    display: flex;
+                    flex-direction: column;
+                    overflow-y: auto;
+                }
+
+                .top-header {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    padding: 20px 40px;
+                    background: transparent;
+                    gap: 20px;
+                }
+                .user-greeting { font-weight: 600; font-size: 0.95rem; white-space: nowrap; }
+                .btn-logout { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+                .btn-logout:hover { background: var(--expense); color: white; border-color: var(--expense); }
+
+                .content-area { padding: 0 40px 40px 40px; flex: 1; overflow-x: hidden; }
+
+                .btn {
+                    padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; font-size: 0.95rem; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;
+                    &:active:not(:disabled) { transform: scale(0.97); }
+                    &.btn-block { width: 100%; }
+                    &:disabled { background: var(--text-muted) !important; color: #e5e7eb !important; cursor: not-allowed; opacity: 0.6; pointer-events: none; box-shadow: none !important; }
+                }
+                :is(.btn-primary, .btn-danger) { color: white; box-shadow: var(--shadow-sm); &:hover:not(:disabled) { box-shadow: var(--shadow-md); } }
+                .btn-primary { background: var(--primary); &:hover:not(:disabled) { background: var(--primary-hover); } }
+                .btn-danger { background: var(--expense); &:hover:not(:disabled) { background: color-mix(in srgb, var(--expense) 85%, black); } }
+                form:has(:invalid) button[type="submit"] { background: var(--text-muted) !important; color: #e5e7eb !important; cursor: not-allowed; opacity: 0.6; pointer-events: none; box-shadow: none !important; }
+
+                .auth-container { display: flex; align-items: center; justify-content: center; min-height: calc(100vh / var(--scale, 1)); padding: 20px; }
+                .auth-card { 
+                    background: var(--card-bg); padding: clamp(24px, 5vw, 40px); border-radius: 16px; box-shadow: var(--shadow-lg); width: 100%; max-width: 400px; border: 1px solid var(--border); transition: background 0.4s, border-color 0.4s; 
+                    & h2 { text-align: center; margin-bottom: 24px; font-size: clamp(1.5rem, 2vw + 0.5rem, 1.75rem); letter-spacing: -0.025em; }
+                }
+                .auth-switch { 
+                    text-align: center; margin-top: 20px; font-size: 0.875rem; color: var(--text-muted); 
+                    & a { color: var(--primary); cursor: pointer; font-weight: 600; text-decoration: none; }
+                }
+
+                .inline-error { display: none; color: var(--expense); font-size: 0.75rem; margin-top: 6px; font-weight: 500; }
+                .custom-err { display: none; color: var(--expense); font-size: 0.75rem; margin-top: 6px; font-weight: 500; }
+                .form-group:has(:invalid:not(:placeholder-shown)) input { 
+                    border-color: var(--expense); 
+                    box-shadow: 0 0 0 3px color-mix(in srgb, var(--expense) 15%, transparent); 
+                }
+                
+                #login-form .form-group:has(:invalid:not(:placeholder-shown)) .inline-error { 
+                    display: block; 
+                }
+                
+                .validation-list { list-style: none; padding: 0; margin: 8px 0 0 0; font-size: 0.75rem; font-weight: 500; display: none; }
+                .form-group:focus-within .validation-list, .form-group:has(input:not(:placeholder-shown)) .validation-list { display: block; }
+                .check-item { color: var(--expense); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; transition: all 0.3s; }
+                .check-item::before { content: '×'; font-size: 1.1em; }
+                .check-item.valid { display: none; }
+
+                .form-group { 
+                    margin-bottom: 20px; position: relative; 
+                    & label { display: block; margin-bottom: 8px; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); }
+                    & :is(input, select) { 
+                        width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text-main); font-family: inherit; font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s; 
+                        &:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent); }
+                    }
+                    & select {
+                        appearance: none; -webkit-appearance: none; -moz-appearance: none;
+                        background-image: url('data:image/svg+xml;utf8,<svg fill="%236b7280" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+                        background-repeat: no-repeat; background-position: right 12px center; padding-right: 40px;
+                        & option { background-color: var(--card-bg); color: var(--text-main); }
+                    }
+                }
+
+                input[type="number"]::-webkit-outer-spin-button,
+                input[type="number"]::-webkit-inner-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                }
+                input[type="number"] {
+                    -moz-appearance: textfield;
+                    appearance: textfield;
+                }
+                
+                .empty-chart-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 250px; text-align: center; gap: 16px; opacity: 0.8; }
+                .empty-chart-state svg { width: 140px; height: 140px; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.15)); }
+                .empty-chart-state h3 { font-size: 1.15rem; color: var(--text-muted); font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+                .empty-chart-state p { font-size: 0.875rem; color: var(--text-muted); margin: 0; }
+
+                .page-title { margin-bottom: 8px; font-weight: 700; letter-spacing: -0.025em; font-size: clamp(1.5rem, 2vw + 1rem, 1.875rem); }
+                .page-subtitle { color: var(--text-muted); margin-bottom: 32px; font-size: clamp(0.875rem, 1vw + 0.5rem, 0.95rem); }
+                
+                .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; }
+                .card { background: var(--card-bg); padding: 24px; border-radius: 16px; border: 1px solid var(--border); transition: transform 0.2s, background 0.4s, border-color 0.4s; position: relative; z-index: 1;
+                    display: grid; grid-template-areas: "icon title" "icon value"; grid-template-columns: 48px 1fr; grid-template-rows: auto auto; column-gap: 16px; row-gap: 2px; align-items: center; align-content: center;
+                    container-type: inline-size;
+                }
+                .card::before { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: var(--shadow-sm); z-index: -1; pointer-events: none; transition: opacity 0.2s; }
+                .card::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: var(--shadow-lg); opacity: 0; transition: opacity 0.2s; z-index: -1; pointer-events: none; }
+                .card:hover { transform: translateY(-4px); }
+                .card:hover::after { opacity: 1; }
+                .card-header { display: contents; }
+                .card-icon { grid-area: icon; align-self: center; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: color-mix(in srgb, var(--primary) 10%, transparent); color: var(--primary); font-size: 1.5rem; }
+                .card-icon.inc { background: color-mix(in srgb, var(--income) 10%, transparent); color: var(--income); }
+                .card-icon.exp { background: color-mix(in srgb, var(--expense) 10%, transparent); color: var(--expense); }
+                .card-title { grid-area: title; align-self: end; font-size: clamp(0.75rem, 4cqi, 0.875rem); color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; line-height: 1.2; }
+                .card-value { grid-area: value; align-self: start; font-size: clamp(1.2rem, 10cqi, 2rem); font-weight: 700; letter-spacing: -0.025em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; line-height: 1.2; }
+                .val-income { color: var(--income); }
+                .val-expense { color: var(--expense); }
+                
+                .dashboard-grid { display: grid; grid-template-columns: 2fr minmax(300px, 1fr); gap: 24px; }
+                .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+                .chart-container, .table-container, .pref-container { background: var(--card-bg); padding: 24px; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); transition: background 0.4s, border-color 0.4s; overflow: hidden; }
+                .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px; }
+                .section-header h3 { font-size: 1.25rem; }
+
+                .filters { display: flex; gap: 8px; background: var(--bg); padding: 4px; border-radius: 24px; border: 1px solid var(--border); flex-wrap: wrap;}
+                .filter-btn { padding: 6px 16px; border-radius: 20px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; white-space: nowrap; }
+                .filter-btn.active { background: var(--card-bg); color: var(--text-main); box-shadow: var(--shadow-sm); }
+                
+                .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; border: 1px solid var(--border); max-height: 400px; }
+                table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: center; background: var(--card-bg); }
+                th, td { padding: 18px 24px; border-bottom: 1px solid var(--border); white-space: nowrap; font-size: 0.95rem; vertical-align: middle; text-align: center; }
+                th { color: var(--text-muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; background: color-mix(in srgb, var(--card-bg) 95%, transparent); position: sticky; top: 0; z-index: 10; backdrop-filter: blur(8px); }
+                tr { transition: all 0.2s ease; }
+                tbody tr:hover { background: color-mix(in srgb, var(--primary) 3%, transparent); transform: scale(1.005) translateY(-1px); box-shadow: var(--shadow-sm); z-index: 5; position: relative; }
+                .del-btn { color: var(--text-muted); background: none; border: none; cursor: pointer; font-size: 1.25rem; transition: color 0.2s, transform 0.2s; padding: 4px; border-radius: 6px; }
+                .del-btn:hover { color: var(--expense); transform: scale(1.15) rotate(5deg); background: color-mix(in srgb, var(--expense) 10%, transparent); }
+                .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+                .badge-income { background: color-mix(in srgb, var(--income) 15%, transparent); color: var(--income); }
+                .badge-expense { background: color-mix(in srgb, var(--expense) 15%, transparent); color: var(--expense); }
+
+                dialog.modal {
+                    background: #111827; 
+                    color: #f9fafb;
+                    width: calc(100% - 32px); 
+                    max-width: 440px; 
+                    padding: clamp(20px, 5vw, 32px); 
+                    border-radius: 16px; 
+                    box-shadow: var(--shadow-lg); 
+                    border: 1px solid color-mix(in srgb, white 10%, transparent); 
+                    margin: auto;
+                    transition: background 0.4s, border-color 0.4s, display 0.4s allow-discrete, overlay 0.4s allow-discrete, opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    opacity: 1;
+                    transform: scale(1);
+                    
+                    &[open] {
+                        @starting-style { opacity: 0; transform: scale(0.95); }
+                    }
+                    &:not([open]) { opacity: 0; transform: scale(0.95); }
+
+                    &::backdrop {
+                        background: color-mix(in srgb, black 60%, transparent);
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        transition: display 0.4s allow-discrete, overlay 0.4s allow-discrete, background-color 0.4s;
+                    }
+                    
+                    &[open]::backdrop {
+                        @starting-style { background-color: transparent; }
+                    }
+
+                    & .form-group label { color: #9ca3af; }
+                    & :is(input, select) {
+                        background: color-mix(in srgb, white 5%, transparent) !important;
+                        color: #f9fafb !important;
+                        border: 1px solid color-mix(in srgb, white 10%, transparent) !important;
+                        border-radius: 12px;
+                        &:focus {
+                            border-color: #8b5cf6 !important;
+                            box-shadow: 0 0 0 3px color-mix(in srgb, #8b5cf6 20%, transparent) !important;
+                        }
+                    }
+                    & select {
+                        -webkit-appearance: none; -moz-appearance: none; appearance: none;
+                        background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%239CA3AF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>');
+                        background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; cursor: pointer;
+                    }
+                    & input[type="date"] {
+                        position: relative;
+                        &::-webkit-calendar-picker-indicator {
+                            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+                            width: 100%; height: 100%; opacity: 0; cursor: pointer;
+                        }
+                    }
+
+                    @supports (appearance: base-select) {
+                        & select, & select::picker(select) { appearance: base-select; }
+                        & select::picker(select) { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow-sm); color: var(--text-main); }
+                    }
+
+                    & .btn-primary { 
+                        background: #8b5cf6; border-radius: 12px; 
+                        &:hover:not(:disabled) { background: #7c3aed; }
+                    }
+                    & .btn-outline { 
+                        background: transparent; border: 1px solid color-mix(in srgb, white 20%, transparent); color: #f9fafb; border-radius: 12px; 
+                        &:hover { background: color-mix(in srgb, white 10%, transparent); }
+                    }
+                }
+                
+                .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+                .modal-header h2 { font-size: 1.25rem; font-weight: 600; }
+                .close-dialog-btn { background: none; border: none; outline: none; font-size: 1.5rem; color: #9ca3af; cursor: pointer; transition: color 0.2s; }
+                .close-dialog-btn:focus-visible { outline: 2px solid #8b5cf6; border-radius: 6px; }
+                .close-dialog-btn:hover { color: #f9fafb; }
+                .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; }
+
+                .settings-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+
+                .theme-toggle-wrapper { background: var(--bg); padding: clamp(10px, 2vw, 16px) clamp(10px, 2vw, 16px); border-radius: 0.75em; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; position: relative; cursor: pointer; overflow: hidden; transition: background 0.4s ease, border-color 0.4s ease; margin-bottom: 1.5em; font-size: clamp(12px, 1vw + 7px, 16px); }
+                .theme-toggle-wrapper > div:first-child { font-size: 1.15em; white-space: nowrap; font-weight: 600; text-overflow: ellipsis; overflow: hidden; }
+                .custom-switch { font-size: 0.85em; width: 4.4em; height: 2.2em; background: #87CEEB; border-radius: 1.25em; position: relative; box-shadow: inset 0 0.1875em 0.375em rgba(0,0,0,0.15); transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; flex-shrink: 0; }
+                .switch-circle { width: 2.4em; height: 2.4em; background: transparent; border-radius: 50%; position: absolute; top: -0.1em; left: 0px; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; align-items: center; justify-content: center; z-index: 5; }
+                .switch-icon { width: 2.4em; height: 2.4em; position: absolute; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+                .icon-sun { opacity: 1; transform: scale(1) rotate(0); }
+                .icon-moon { opacity: 0; transform: scale(0.4) rotate(-90deg) translateY(-1.25em); }
+                .switch-bg-clouds { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: opacity 0.5s, transform 0.6s; z-index: 1; }
+                .switch-bg-clouds::before {
+                    content: ''; position: absolute; bottom: -0.375em; left: -10%; width: 120%; height: 100%;
+                    background: 
+                        radial-gradient(circle at 20% 100%, #fff 0.875em, transparent 0.9em),
+                        radial-gradient(circle at 45% 110%, #fff 1.375em, transparent 1.4em),
+                        radial-gradient(circle at 75% 100%, #fff 1em, transparent 1.031em),
+                        radial-gradient(circle at 95% 100%, #fff 0.75em, transparent 0.781em);
+                    filter: drop-shadow(0 -0.1875em 0.25em rgba(255,255,255,0.9));
+                    opacity: 0.95;
+                }
+                
+                .switch-bg-stars { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.6s, transform 0.6s; z-index: 1; transform: translateY(0.625em); }
+                .switch-bg-stars::before {
+                    content: ''; position: absolute; width: 0.125em; height: 0.125em; background: transparent; border-radius: 50%;
+                    box-shadow: 0.75em 0.625em 0 0 #fff, 1.75em 1.5625em 0 -0.031em rgba(255,255,255,0.9), 2.8125em 0.75em 0 0.031em #fff, 3.875em 1.75em 0 -0.031em rgba(255,255,255,0.7), 4.5em 0.875em 0 0 #fff;
+                    animation: twinkle 3s infinite alternate ease-in-out;
+                }
+                .switch-bg-stars::after {
+                    content: ''; position: absolute; width: 0.0625em; height: 0.0625em; background: transparent; border-radius: 50%;
+                    box-shadow: 1.25em 1.125em 0 0 #fff, 2.375em 0.5em 0 0 rgba(255,255,255,0.6), 3.4375em 1.375em 0 0 #fff, 4.6875em 2em 0 0 rgba(255,255,255,0.5);
+                    animation: twinkle 2s infinite alternate-reverse ease-in-out;
+                }
+                
+                @keyframes twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.1); } }
+
+                .pref-container { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding-inline: clamp(16px, 3vw, 24px); }
+                .pref-container .theme-toggle-wrapper, .pref-container #reset-btn-dash { margin: 0; }
+
+                @media (min-width: 1101px) {
+                    .pref-container #reset-btn-dash { margin-top: 16px; } 
+                }
+                
+                @media (max-width: 1100px) {
+                    .dashboard-grid, .settings-layout { grid-template-columns: 1fr; }
+                }
+                
+                @media (max-width: 1100px) and (min-width: 901px) {
+                    
+                    .content-area { padding: 0 24px 32px 24px; }
+                    .chart-container, .table-container, .pref-container { padding: 18px; }
+                    th, td { padding: 14px 12px; font-size: 0.875rem; }
+                }
+                
+                @media (max-width: 1100px) and (min-width: 481px) {
+                    
+                    .pref-container .theme-toggle-wrapper, .pref-container #reset-btn-dash { 
+                        max-width: 400px; 
+                        margin-inline: auto; 
+                        width: 100%; 
+                    }
+                }
+                @media (max-width: 900px) {
+                    #dashboard-layout {
+                        grid-template-columns: 1fr auto;
+                        grid-template-rows: auto auto auto 1fr;
+                        grid-template-areas:
+                            "brand   header"
+                            "nav     nav"
+                            "addbtn  addbtn"
+                            "content content";
+                        background: var(--sidebar-bg);
+                    }
+                    .sidebar, .main-wrapper {
+                        display: contents;
+                    }
+                    .nav-brand { grid-area: brand; justify-content: flex-start; padding: 16px 20px; margin: 0; width: auto; }
+                    .top-header { grid-area: header; justify-content: flex-end; padding: 16px 20px; background: transparent; }
+                    .top-header .user-greeting { display: none; }
+                    .top-header .btn-logout { border-color: color-mix(in srgb, white 20%, transparent); color: var(--sidebar-text); }
+                    .top-header .btn-logout:hover { background: var(--expense); border-color: var(--expense); color: white; }
+                    .nav-links { grid-area: nav; flex-direction: row; flex: unset; gap: 12px; justify-content: flex-start; padding: 0 20px 16px 20px; width: 100%; }
+                    .sidebar-bottom { grid-area: addbtn; margin: 0; padding: 0 20px 16px 20px; width: 100%; }
+                    .content-area { 
+                        grid-area: content; 
+                        padding: 24px 20px 40px 20px; 
+                        background: var(--bg-main); 
+                        border-top-left-radius: 24px;
+                        border-top-right-radius: 24px;
+                        overflow-y: auto; 
+                        box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+                    }
+                }
+                @media (min-width: 769px) and (max-width: 900px) {
+                    #dashboard-layout {
+                        grid-template-rows: auto auto 1fr;
+                        grid-template-areas:
+                            "brand   header"
+                            "nav     addbtn"
+                            "content content";
+                    }
+                    .nav-links { padding: 0 0 16px 20px; width: auto; align-items: center; }
+                    .sidebar-bottom { padding: 0 20px 16px 12px; width: auto; display: flex; align-items: center; justify-content: flex-end; }
+                    .sidebar-bottom .btn-block { width: fit-content; padding: 10px 20px; }
+                    #reset-btn { width: 85%; max-width: 320px; margin: 20px auto 0 !important; display: block; }
+                }
+                @media (max-width: 780px) {
+                    #open-modal-btn, #reset-btn-dash, .pref-container .theme-toggle-wrapper { 
+                        
+                        width: clamp(220px, 85%, 340px) !important; 
+                        margin-inline: auto; 
+                    }
+                    #open-modal-btn, #reset-btn-dash {
+                        display: block; 
+                    }
+                    .pref-container .theme-toggle-wrapper {
+                        
+                        font-size: 0.95rem !important; 
+                        padding: 12px 20px !important; 
+                    }
+                }
+                @media (max-width: 768px) {
+                    .table-container {
+                        border: none;
+                        background: transparent;
+                        box-shadow: none;
+                        padding: 0;
+                    }
+                    .section-header {
+                        margin-bottom: 16px;
+                    }
+                    .form-grid { grid-template-columns: 1fr; }
+                    .table-responsive { 
+                        border: none; background: transparent; 
+                        & table, & thead, & tbody, & th, & td, & tr { display: block; }
+                        & table { background: transparent; }
+                        & thead tr { position: absolute; top: -9999px; left: -9999px; }
+                        & tr { border: none; border-radius: 12px; margin-bottom: 16px; padding: 12px 16px; background: color-mix(in srgb, var(--card-bg) 50%, transparent); box-shadow: var(--shadow-sm); }
+                        & td { 
+                            border: none; border-bottom: 1px solid color-mix(in srgb, var(--border) 40%, transparent); padding: 12px 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; text-align: right; min-height: 48px; white-space: normal; word-break: break-word; 
+                            &:last-child { border-bottom: 0; }
+                            &::before { content: attr(data-label); font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; text-align: left; flex-shrink: 0; flex-basis: 40%; }
+                        }
+                    }
+                }
+                @media (max-width: 480px) {
+                    .summary-cards { grid-template-columns: 1fr; }
+                    .chart-container, .pref-container { padding: 20px 16px; }
+                    .pref-container .section-header { margin-bottom: 12px; }
+                    #open-modal-btn, #reset-btn-dash, .pref-container .theme-toggle-wrapper { width: 100% !important; max-width: none !important; margin-inline: 0 !important; }
+                    .theme-toggle-wrapper { padding: 14px 16px; font-size: 1.05rem; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function buildUI() {
+            const app = $('app');
+            app.innerHTML = `
+                
+                <div id="login-view" class="auth-container">
+                    <div class="auth-card">
+                        <h2>FinTrack Pro</h2>
+                        <form id="login-form">
+                            <div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" required placeholder=" "><span class="inline-error">Invalid email format or unregistered</span></div>
+                            <div class="form-group"><label for="login-password">Password</label><input type="password" id="login-password" required placeholder=" "><span class="inline-error">Incorrect password</span></div>
+                            <button type="submit" id="login-submit-btn" class="btn btn-primary btn-block">Log In</button>
+                        </form>
+                        <div class="auth-switch">New here? <a id="go-to-register">Register</a></div>
+                    </div>
+                </div>
+
+                <div id="register-view" class="auth-container hidden">
+                    <div class="auth-card">
+                        <h2>Create Account</h2>
+                        <form id="register-form" novalidate>
+                            <div class="form-group"><label for="reg-name">Name</label><input type="text" id="reg-name" required autocomplete="off" placeholder=" "></div>
+                            <div class="form-group">
+                                <label for="reg-email">Email</label><input type="email" id="reg-email" required placeholder=" "><span id="email-taken-err" class="custom-err">Email already registered</span>
+                                <ul class="validation-list" id="email-checks">
+                                    <li class="check-item" id="req-email-format">Valid email format required</li>
+                                </ul>
+                            </div>
+                            <div class="form-group">
+                                <label for="reg-password">Password</label><input type="password" id="reg-password" required placeholder=" ">
+                                <ul class="validation-list" id="pwd-checks">
+                                    <li class="check-item" id="req-pwd-len">Minimum 8 characters</li>
+                                    <li class="check-item" id="req-pwd-up">1 Uppercase letter</li>
+                                    <li class="check-item" id="req-pwd-low">1 Lowercase letter</li>
+                                    <li class="check-item" id="req-pwd-num">1 Number</li>
+                                    <li class="check-item" id="req-pwd-sp">1 Special character</li>
+                                </ul>
+                            </div>
+                            <button type="submit" id="reg-submit-btn" class="btn btn-primary btn-block">Sign Up</button>
+                        </form>
+                        <div class="auth-switch">Have an account? <a id="go-to-login">Log In</a></div>
+                    </div>
+                </div>
+
+                <div id="dashboard-layout" class="hidden">
+                    <aside class="sidebar">
+                        <div class="nav-brand" id="logo-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            FinTrack
+                        </div>
+                        <div class="nav-links">
+                            <a class="active" id="nav-dashboard">Dashboard</a>
+                            <a id="nav-settings">Settings</a>
+                        </div>
+                        <div class="sidebar-bottom">
+                            <button class="btn btn-primary btn-block" id="open-modal-btn">+ Add Transaction</button>
+                        </div>
+                    </aside>
+                    
+                    <div class="main-wrapper">
+                        <header class="top-header">
+                            <span class="user-greeting">Hi, <span id="greeting-name"></span></span>
+                            <button id="logout-btn" class="btn-logout">Logout</button>
+                        </header>
+                        
+                        <main class="content-area">
+                            
+                            <div id="dashboard-page">
+                                <h1 class="page-title">Financial Overview</h1>
+                                <p class="page-subtitle">Real-time tracking application</p>
+                                
+                                <div class="summary-cards">
+                                    <div class="card">
+                                        <div class="card-header"><div class="card-icon">🏦</div><div class="card-title">Current Balance</div></div>
+                                        <div class="card-value val-balance" id="total-balance">$0.00</div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-header"><div class="card-icon inc">📈</div><div class="card-title">Total Income</div></div>
+                                        <div class="card-value val-income" id="total-income">$0.00</div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-header"><div class="card-icon exp">📉</div><div class="card-title">Total Expense</div></div>
+                                        <div class="card-value val-expense" id="total-expense">$0.00</div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-header"><div class="card-icon">📊</div><div class="card-title">Transactions</div></div>
+                                        <div class="card-value" id="total-txCount">0</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="dashboard-grid">
+                                    <div class="chart-container">
+                                        <div class="section-header" style="margin-bottom: 8px;"><h2>Cash Flow</h2></div>
+                                        <div style="height: 250px;"><canvas id="cashFlowChart"></canvas></div>
+                                    </div>
+                                    <div class="pref-container">
+                                        <div class="section-header"><h2>Preferences</h2></div>
+                                        <div class="theme-toggle-wrapper" id="dark-toggle">
+                                            <div style="font-weight: 500;">Dark Mode</div>
+                                            <div class="custom-switch">
+                                                <div class="switch-bg-clouds"></div><div class="switch-bg-stars"></div>
+                                                <div class="switch-circle">
+                                                    <div class="switch-icon icon-sun">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" overflow="visible">
+                                                          <defs>
+                                                            <filter id="sun-3d" x="-50%" y="-50%" width="200%" height="200%">
+                                                              <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+                                                              <feSpecularLighting in="blur" surfaceScale="5" specularConstant="1.2" specularExponent="20" lighting-color="#ffffff" result="specOut">
+                                                                <fePointLight x="30" y="30" z="40"/>
+                                                              </feSpecularLighting>
+                                                              <feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut2"/>
+                                                              <feComposite in="SourceGraphic" in2="specOut2" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+                                                            </filter>
+                                                            <radialGradient id="sun-grad" cx="30%" cy="30%" r="70%">
+                                                              <stop offset="0%" stop-color="#fff9c4"/>
+                                                              <stop offset="30%" stop-color="#ffca28"/>
+                                                              <stop offset="70%" stop-color="#ff8f00"/>
+                                                              <stop offset="100%" stop-color="#d84315"/>
+                                                            </radialGradient>
+                                                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                                              <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+                                                              <feMerge>
+                                                                <feMergeNode in="coloredBlur"/>
+                                                                <feMergeNode in="SourceGraphic"/>
+                                                              </feMerge>
+                                                            </filter>
+                                                          </defs>
+                                                          <circle cx="50" cy="50" r="35" fill="url(#sun-grad)" filter="url(#sun-3d)" />
+                                                          <circle cx="50" cy="50" r="42" fill="none" stroke="#ffca28" stroke-width="2" opacity="0.6" filter="url(#glow)" stroke-dasharray="4 8" />
+                                                        </svg>
+                                                    </div>
+                                                    <div class="switch-icon icon-moon">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" overflow="visible">
+                                                          <defs>
+                                                            <filter id="moon-3d" x="-50%" y="-50%" width="200%" height="200%">
+                                                              <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+                                                              <feDiffuseLighting in="blur" surfaceScale="6" diffuseConstant="1.5" lighting-color="#ffffff" result="diffOut">
+                                                                <fePointLight x="25" y="25" z="30"/>
+                                                              </feDiffuseLighting>
+                                                              <feSpecularLighting in="blur" surfaceScale="6" specularConstant="0.8" specularExponent="25" lighting-color="#ffffff" result="specOut">
+                                                                <fePointLight x="25" y="25" z="30"/>
+                                                              </feSpecularLighting>
+                                                              <feComposite in="diffOut" in2="SourceAlpha" operator="in" result="diffOut2"/>
+                                                              <feComposite in="diffOut2" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="lit"/>
+                                                              <feBlend in="SourceGraphic" in2="lit" mode="multiply"/>
+                                                            </filter>
+                                                            <radialGradient id="moon-grad" cx="30%" cy="30%" r="70%">
+                                                              <stop offset="0%" stop-color="#f5f5f5"/>
+                                                              <stop offset="40%" stop-color="#e0e0e0"/>
+                                                              <stop offset="80%" stop-color="#9e9e9e"/>
+                                                              <stop offset="100%" stop-color="#616161"/>
+                                                            </radialGradient>
+                                                            <filter id="crater-inset">
+                                                               <feOffset dx="1" dy="1"/>
+                                                               <feGaussianBlur stdDeviation="1" result="offset-blur"/>
+                                                               <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+                                                               <feFlood flood-color="black" flood-opacity="0.7" result="color"/>
+                                                               <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+                                                               <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+                                                            </filter>
+                                                          </defs>
+                                                          <circle cx="50" cy="50" r="35" fill="url(#moon-grad)" filter="url(#moon-3d)"/>
+                                                          <g fill="#9e9e9e" opacity="0.6" filter="url(#crater-inset)">
+                                                            <circle cx="40" cy="35" r="5"/>
+                                                            <circle cx="65" cy="50" r="7"/>
+                                                            <circle cx="50" cy="65" r="4"/>
+                                                            <circle cx="35" cy="55" r="2.5"/>
+                                                            <circle cx="70" cy="30" r="2"/>
+                                                          </g>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-danger btn-block" id="reset-btn-dash">🗑 Reset Data</button>
+                                    </div>
+                                </div>
+
+                                <div class="table-container" style="margin-top: 24px;">
+                                    <div class="section-header">
+                                        <h2>Transactions</h2>
+                                        <div class="filters" id="filter-container">
+                                            <button class="filter-btn active" data-filter="All">All</button>
+                                            <button class="filter-btn" data-filter="Income">Income</button>
+                                            <button class="filter-btn" data-filter="Expense">Expense</button>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table>
+                                            <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th>Action</th></tr></thead>
+                                            <tbody id="tx-tbody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="settings-page" class="hidden">
+                                <h1 class="page-title">Settings</h1>
+                                <p class="page-subtitle">Manage your account profile</p>
+                                
+                                <div class="settings-layout">
+                                    <form id="settings-form" class="chart-container">
+                                        <h2 style="margin-bottom: 24px;">Profile Details</h2>
+                                        <div class="form-grid">
+                                            <div class="form-group"><label for="setting-name">Full Name</label><input type="text" id="setting-name" autocomplete="off" required></div>
+                                            <div class="form-group"><label for="setting-currency">Currency</label><select id="setting-currency" required><option value="$">USD ($)</option><option value="€">EUR (€)</option><option value="£">GBP (£)</option><option value="₹">INR (₹)</option></select></div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary" id="save-settings-btn" style="margin-top: 16px;">Save Changes</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+
+                <dialog id="tx-modal" class="modal">
+                    <div class="modal-header">
+                        <h2>Add Transaction</h2>
+                        <button type="button" class="close-dialog-btn" id="close-modal-icon">&times;</button>
+                    </div>
+                    <form id="tx-form" method="dialog">
+                        <div class="form-group"><label for="tx-type">Type</label><select id="tx-type"><option value="Income">Income</option><option value="Expense" selected>Expense</option></select></div>
+                        <div class="form-group"><label for="tx-desc">Description</label><input type="text" id="tx-desc" required placeholder="e.g. Amazon, Salary"></div>
+                        <div class="form-grid">
+                            <div class="form-group"><label for="tx-amount">Amount</label><input type="number" id="tx-amount" min="0.01" step="0.01" required></div>
+                            <div class="form-group"><label for="tx-date">Date</label><input type="date" id="tx-date" required></div>
+                        </div>
+                        <div class="form-group"><label for="tx-category">Category</label><select id="tx-category" required><option value="">Select</option><option value="Salary">Salary</option><option value="Food">Food</option><option value="Shopping">Shopping</option><option value="Other">Other</option></select></div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-outline" id="close-modal-btn">Cancel</button>
+                            <button type="submit" id="tx-submit-btn" class="btn btn-primary">Save Transaction</button>
+                        </div>
+                    </form>
+                </dialog>
+            `;
+        }
+
+        function applyScaling() {
+            const app = $('app');
+            const screenWidth = document.documentElement.clientWidth;
+            const screenHeight = document.documentElement.clientHeight;
+            const baseWidth = 1920; 
+            
+            app.style.position = 'relative';
+            app.style.left = 'auto';
+            app.style.top = 'auto';
+            app.style.margin = '0';
+
+            if (screenWidth > baseWidth) {
+                
+                const scaleFactor = screenWidth / baseWidth;
+                document.documentElement.style.setProperty('--scale', scaleFactor);
+                
+                app.style.width = `${baseWidth}px`;
+                app.style.height = `${screenHeight / scaleFactor}px`; 
+                app.style.transform = `scale(${scaleFactor})`;
+                app.style.transformOrigin = 'top left';
+            } else {
+                document.documentElement.style.setProperty('--scale', 1);
+                app.style.width = '100%';
+                app.style.height = '100vh';
+                app.style.transform = 'none';
+            }
+        }
+        window.addEventListener('resize', applyScaling);
+
+        function toTitleCase(str) { return str.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+
+        function transitionView(updateDOM) {
+            if (document.startViewTransition) {
+                try {
+                    const t = document.startViewTransition(updateDOM);
+                    if(t.ready) t.ready.catch(() => {});
+                    if(t.finished) t.finished.catch(() => {});
+                    if(t.updateCallbackDone) t.updateCallbackDone.catch(() => {});
+                } catch(e) {
+                    updateDOM();
+                }
+            } else {
+                updateDOM();
+            }
+        }
+
+        function bindEvents() {
+            
+            $('go-to-register').addEventListener('click', () => transitionView(() => { toggleViews('register-view', ['login-view', 'register-view']); $('login-form').reset(); }));
+            $('go-to-login').addEventListener('click', () => transitionView(() => { toggleViews('login-view', ['login-view', 'register-view']); $('register-form').reset(); }));
+            
+            ['reg-email', 'login-email', 'login-password'].forEach(id => {
+                document.getElementById(id).addEventListener('input', (e) => e.target.setCustomValidity(''));
+            });
+
+            const regEmail = $('reg-email');
+            const emailFormat = $('req-email-format');
+            const errSpan = $('email-taken-err');
+            regEmail.addEventListener('input', (e) => {
+                const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.target.value);
+                emailFormat.classList.toggle('valid', isValid);
+                errSpan.style.display = 'none';
+            });
+
+            const regPwd = $('reg-password');
+            const pwdReqs = {
+                'req-pwd-len': (v) => v.length >= 8,
+                'req-pwd-up': (v) => /[A-Z]/.test(v),
+                'req-pwd-low': (v) => /[a-z]/.test(v),
+                'req-pwd-num': (v) => /\d/.test(v),
+                'req-pwd-sp': (v) => /[\W_]/.test(v)
+            };
+
+            regPwd.setCustomValidity('Please complete all requirements');
+
+            regPwd.addEventListener('input', (e) => {
+                const val = e.target.value;
+                let allPassed = true;
+                for (const [id, testFn] of Object.entries(pwdReqs)) {
+                    const passed = testFn(val);
+                    document.getElementById(id).classList.toggle('valid', passed);
+                    if (!passed) allPassed = false;
+                }
+                
+                if (allPassed) {
+                    e.target.setCustomValidity('');
+                } else {
+                    e.target.setCustomValidity('Please complete all requirements');
+                }
+            });
+
+            const formMaps = {
+                'login-form': 'login-submit-btn',
+                'register-form': 'reg-submit-btn',
+                'tx-form': 'tx-submit-btn',
+                'settings-form': 'save-settings-btn'
+            };
+
+            ['reg-name', 'setting-name'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', (e) => e.target.value = toTitleCase(e.target.value));
+            });
+
+            Object.keys(formMaps).forEach(id => {
+                const form = document.getElementById(id);
+                if (!form) return;
+                form.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const inputs = Array.from(form.elements).filter(el => !el.disabled && (el.tagName === 'INPUT' || el.tagName === 'SELECT'));
+                        const submitBtn = form.querySelector('button[type="submit"]');
+                        const invalidInputs = inputs.filter(el => !el.checkValidity() || (el.tagName === 'INPUT' && el.value.trim() === ''));
+
+                        if (invalidInputs.length === 0 && submitBtn && !submitBtn.disabled) {
+                            submitBtn.click();
+                            return;
+                        }
+
+                        if (!e.target.checkValidity() || (e.target.tagName === 'INPUT' && e.target.value.trim() === '')) {
+                            e.target.reportValidity();
+                            return; 
+                        }
+
+                        const currentIndex = inputs.indexOf(e.target);
+                        if (currentIndex > -1 && currentIndex < inputs.length - 1) {
+                            inputs[currentIndex + 1].focus();
+                        } else if (invalidInputs.length > 0) {
+                            
+                            invalidInputs[0].focus();
+                            invalidInputs[0].reportValidity();
+                        }
+                    }
+                });
+            });
+
+            $('register-form').addEventListener('submit', handleRegister);
+            $('login-form').addEventListener('submit', handleLogin);
+            $('logout-btn').addEventListener('click', handleLogout);
+
+            $('nav-dashboard').addEventListener('click', () => showPage('dashboard'));
+            $('nav-settings').addEventListener('click', () => showPage('settings'));
+            $('logo-btn').addEventListener('click', () => { if(AppState.session) showPage('dashboard'); });
+
+            const modal = $('tx-modal');
+            $('open-modal-btn').addEventListener('click', () => {
+                modal.showModal();
+                $('tx-date').valueAsDate = new Date();
+            });
+            $('close-modal-btn').addEventListener('click', closeModal);
+            $('close-modal-icon').addEventListener('click', closeModal);
+
+            modal.addEventListener('click', (e) => { 
+                const rect = modal.getBoundingClientRect();
+                const isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height && rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
+                if (!isInDialog) closeModal(); 
+            });
+            
+            $('tx-form').addEventListener('submit', addTransaction);
+
+            document.querySelectorAll('select').forEach(sel => {
+                sel.addEventListener('mousedown', function(e) {
+                    if (this === document.activeElement) {
+                        this.blur();
+                        e.preventDefault();
+                    }
+                });
+            });
+
+            $('filter-container').addEventListener('click', (e) => { 
+                if (e.target.classList.contains('filter-btn')) { 
+                    AppState.activeFilter = e.target.dataset.filter; 
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); 
+                    e.target.classList.add('active'); 
+                    masterRefresh(); 
+                } 
+            });
+
+            $('settings-form').addEventListener('submit', saveSettings);
+            $('dark-toggle').addEventListener('click', toggleDarkMode);
+            $('reset-btn-dash').addEventListener('click', resetUserData);
+
+            $('tx-tbody').addEventListener('click', (e) => { 
+                const btn = e.target.closest('.del-btn'); 
+                if(btn && confirm("Delete transaction?")) { 
+                    AppState.transactions = AppState.transactions.filter(t => t.id !== parseInt(btn.dataset.id)); 
+                    saveTxs(); 
+                    masterRefresh(); 
+                } 
+            });
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const form = e.target;
+
+            if (!form.checkValidity()) {
+                const invalidInput = Array.from(form.elements).find(el => !el.checkValidity());
+                if (invalidInput) invalidInput.focus();
+                return; 
+            }
+
+            const emailInput = $('reg-email');
+            const email = emailInput.value.trim().toLowerCase();
+            const errSpan = $('email-taken-err');
+            
+            if (AppState.users.some(u => u.email === email)) { 
+                emailInput.setCustomValidity("Email already registered");
+                errSpan.style.display = 'block';
+                emailInput.focus();
+                return; 
+            } else {
+                emailInput.setCustomValidity("");
+                errSpan.style.display = 'none';
+            }
+
+            const name = $('reg-name').value.trim();
+            const password = $('reg-password').value;
+            
+            AppState.users.push({ name, email, password, settings: { currency: '$', dark: false } });
+            saveUsers();
+            
+            loginUser(email);
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const emailInput = $('login-email');
+            const passwordInput = $('login-password');
+            const email = emailInput.value.trim().toLowerCase();
+            const password = passwordInput.value;
+
+            emailInput.setCustomValidity("");
+            passwordInput.setCustomValidity("");
+
+            const userByEmail = AppState.users.find(u => u.email === email);
+            if (!userByEmail) {
+                emailInput.setCustomValidity("Email not registered");
+                emailInput.reportValidity();
+                return;
+            }
+
+            if (userByEmail.password !== password) {
+                passwordInput.setCustomValidity("Incorrect password");
+                passwordInput.reportValidity();
+                return;
+            }
+
+            loginUser(email);
+        }
+
+        function loginUser(email) {
+            AppState.session = email; localStorage.setItem('fintrack_session', email);
+            $('login-form').reset(); $('register-form').reset();
+            applySettings(); masterRefresh(); showPage('dashboard');
+        }
+
+        function toggleViews(activeId, viewIds) {
+            viewIds.forEach(id => document.getElementById(id).classList.toggle('hidden', id !== activeId));
+        }
+
+        function handleLogout() {
+            AppState.session = null; localStorage.removeItem('fintrack_session');
+            document.body.classList.remove('dark-mode'); 
+            transitionView(() => {
+                toggleViews('login-view', ['login-view', 'register-view', 'dashboard-layout']);
+            });
+        }
+
+        function resetUserData() {
+            if (confirm("🚨 WARNING: Delete all your data? This cannot be undone.")) {
+                AppState.transactions = AppState.transactions.filter(tx => tx.userEmail !== AppState.session); 
+                saveTxs();
+                masterRefresh();
+            }
+        }
+
+        function showPage(id) {
+            if (!AppState.session) return;
+            transitionView(() => {
+                toggleViews('dashboard-layout', ['login-view', 'register-view', 'dashboard-layout']);
+                toggleViews(`${id}-page`, ['dashboard-page', 'settings-page']);
+                
+                document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+                document.getElementById(`nav-${id}`).classList.add('active');
+            });
+        }
+
+        function closeModal() { 
+            const modal = $('tx-modal');
+            modal.close(); 
+            $('tx-form').reset(); 
+            $('tx-date').valueAsDate = new Date(); 
+        }
+
+        function addTransaction(e) {
+            e.preventDefault();
+            const category = $('tx-category').value;
+            if (!category) {
+                alert("Please select a category.");
+                return;
+            }
+            AppState.transactions.push({ id: Date.now(), userEmail: AppState.session, type: $('tx-type').value, desc: $('tx-desc').value.trim(), amount: parseFloat($('tx-amount').value), category: category, date: $('tx-date').value });
+            saveTxs(); closeModal(); masterRefresh();
+        }
+
+        function formatCurrency(amount) { return `${getSettings()?.currency ?? '$'}${amount.toFixed(2)}`; }
+
+        function masterRefresh() {
+            if (!AppState.session) return;
+            const txs = getUserTransactions();
+            const grouped = Object.groupBy ? Object.groupBy(txs, t => t.type) : { Income: txs.filter(t => t.type === 'Income'), Expense: txs.filter(t => t.type === 'Expense') };
+            const inc = (grouped.Income || []).reduce((sum, t) => sum + t.amount, 0);
+            const exp = (grouped.Expense || []).reduce((sum, t) => sum + t.amount, 0);
+            $('total-balance').textContent = formatCurrency(inc - exp);
+            $('total-income').textContent = formatCurrency(inc);
+            $('total-expense').textContent = formatCurrency(exp);
+            $('total-txCount').textContent = txs.length;
+            
+            const tbody = $('tx-tbody');
+            const filtered = AppState.activeFilter === 'All' ? txs : txs.filter(t => t.type === AppState.activeFilter);
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 48px 24px; color: var(--text-muted); font-size: 0.95rem; background: transparent; box-shadow: none;">No transactions found.</td></tr>`;
+            } else {
+                tbody.innerHTML = filtered.sort((a,b) => new Date(b.date) - new Date(a.date)).map(tx => {
+                    const isInc = tx.type === 'Income';
+                    return `<tr><td data-label="Date">${tx.date}</td><td data-label="Description" style="font-weight:500;">${tx.desc}</td><td data-label="Category"><span class="badge ${isInc ? 'badge-income' : 'badge-expense'}">${tx.category}</span></td><td data-label="Amount" class="${isInc ? 'val-income' : 'val-expense'}" style="font-weight:600;">${isInc ? '+' : '-'}${formatCurrency(tx.amount)}</td><td data-label="Action"><button class="del-btn" data-id="${tx.id}">🗑️</button></td></tr>`;
+                }).join('');
+            }
+
+            if(window.Chart) {
+                if(AppState.chartInstance) AppState.chartInstance.destroy();
+
+                const groupedTxs = Object.groupBy ? Object.groupBy(txs, tx => tx.date) : 
+                    txs.reduce((acc, tx) => {
+                        (acc[tx.date] = acc[tx.date] || []).push(tx);
+                        return acc;
+                    }, {});
+
+                const labels = Object.keys(groupedTxs ?? {}).sort((a,b) => new Date(a) - new Date(b));
+                const incData = labels.map(date => groupedTxs[date].filter(t => t.type === 'Income').reduce((s, t) => s + t.amount, 0));
+                const expData = labels.map(date => groupedTxs[date].filter(t => t.type === 'Expense').reduce((s, t) => s + t.amount, 0));
+
+                const isDark = getSettings()?.dark ?? false;
+                const chartCanvas = $('cashFlowChart');
+                const chartParent = chartCanvas.parentElement;
+
+                if (labels.length === 0) {
+                    chartCanvas.style.display = 'none';
+                    let emptyState = $('chart-empty-state');
+                    if (!emptyState) {
+                        emptyState = document.createElement('div');
+                        emptyState.id = 'chart-empty-state';
+                        emptyState.className = 'empty-chart-state';
+                        emptyState.innerHTML = `
+                            <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="240" height="240" fill="transparent"/>
+                                
+                                <path d="M40 180 L200 180" stroke="var(--border)" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M40 140 L200 140 M40 100 L200 100 M40 60 L200 60" stroke="var(--border)" stroke-width="2" stroke-dasharray="4 4" opacity="0.5"/>
+                                
+                                <rect x="60" y="120" width="24" height="60" rx="4" fill="var(--income)" opacity="0.3"/>
+                                <rect x="90" y="90" width="24" height="90" rx="4" fill="var(--expense)" opacity="0.3"/>
+                                <rect x="130" y="140" width="24" height="40" rx="4" fill="var(--income)" opacity="0.3"/>
+                                <rect x="160" y="70" width="24" height="110" rx="4" fill="var(--expense)" opacity="0.3"/>
+                                
+                                <circle cx="120" cy="120" r="24" fill="var(--card-bg)" stroke="var(--border)" stroke-width="3"/>
+                                <path d="M110 110 L130 130 M130 110 L110 130" stroke="var(--text-muted)" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                            <div>
+                                <h3>No Activity Yet</h3>
+                                <p>Add a transaction to see your cash flow</p>
+                            </div>
+                        `;
+                        chartParent.appendChild(emptyState);
+                    }
+                    emptyState.style.display = 'flex';
+                } else {
+                    chartCanvas.style.display = 'block';
+                    const emptyState = $('chart-empty-state');
+                    if (emptyState) emptyState.style.display = 'none';
+
+                    AppState.chartInstance = new Chart(chartCanvas.getContext('2d'), { 
+                        type: 'bar', 
+                        data: { 
+                            labels: labels, 
+                            datasets: [
+                                {label:'Income', data: incData, backgroundColor: '#10b981', borderRadius: 4, maxBarThickness: 45}, 
+                                {label:'Expense', data: expData, backgroundColor: '#ef4444', borderRadius: 4, maxBarThickness: 45}
+                            ] 
+                        }, 
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false, 
+                            scales: {
+                                y: {grid: {color: isDark ? '#374151' : '#e5e7eb'}, ticks: {color: isDark ? '#9ca3af' : '#6b7280'}}, 
+                                x: {grid: {display: false}, ticks: {color: isDark ? '#9ca3af' : '#6b7280'}}
+                            }, 
+                            plugins: {
+                                legend: {
+                                    align: 'center',
+                                    labels: {
+                                        color: isDark ? '#f9fafb' : '#1f2937',
+                                        usePointStyle: true,
+                                        pointStyle: 'rectRounded',
+                                        boxWidth: 14,
+                                        boxPadding: 6,
+                                        padding: 20,
+                                        font: { size: 12 }
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [{
+                            id: 'legendMarginBottom',
+                            beforeInit(chart) {
+                                const originalFit = chart.legend.fit;
+                                chart.legend.fit = function fit() {
+                                    originalFit.bind(chart.legend)();
+                                    return this.height += 16;
+                                };
+                            }
+                        }]
+                    });
+                }
+            }
+        }
+
+        function toggleDarkMode() { 
+            const user = getCurrentUser(); if(!user) return; 
+            user.settings.dark = !user.settings.dark; 
+            saveUsers(); 
+            applySettings(); 
+            if(AppState.chartInstance) masterRefresh(); 
+        }
+
+        function saveSettings(e) { 
+            if (e) e.preventDefault();
+            const user = getCurrentUser(); if(!user) return; 
+            user.name = $('setting-name').value; 
+            user.settings.currency = $('setting-currency').value; 
+            saveUsers(); 
+            applySettings(); 
+            masterRefresh(); 
+            alert('Settings saved successfully!');
+        }
+        
+        function applySettings() {
+            const user = getCurrentUser(); if(!user) return;
+            $('greeting-name').textContent = user.name; 
+            $('setting-name').value = user.name; 
+            $('setting-currency').value = user.settings.currency;
+            document.body.classList.toggle('dark-mode', user.settings.dark);
+        }
+
+        function initApp() {
+            injectCSS(); buildUI(); bindEvents(); applyScaling();
+            
+            if (AppState.session && getCurrentUser()) {
+                $('login-view').classList.add('hidden'); 
+                applySettings();
+                loadDependencies(() => { masterRefresh(); showPage('dashboard'); });
+            } else {
+                handleLogout(); 
+                loadDependencies(()=>{});
+            }
+        }
+        initApp();
+    </script>
+</body>
+</html>
