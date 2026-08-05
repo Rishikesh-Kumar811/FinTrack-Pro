@@ -447,11 +447,7 @@
                     .date-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
                     .date-wrapper input[type="date"] { width: 100%; padding-right: 44px; cursor: text; }
                     .date-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
-                        position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-                        width: 30px; height: 30px;
-                        opacity: 0; cursor: pointer;
-                        margin: 0; padding: 0;
-                        z-index: 10;
+                        display: none;
                     }
                     .date-icon {
                         position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
@@ -1031,13 +1027,25 @@
 
             initCustomSelects();
 
-            document.querySelectorAll('.date-wrapper .date-icon').forEach(icon => {
+            document.querySelectorAll('.date-wrapper').forEach(wrapper => {
+                const icon = wrapper.querySelector('.date-icon');
+                const input = wrapper.querySelector('input[type="date"]');
+                if (!icon || !input) return;
+                let pickerOpen = false;
                 icon.style.pointerEvents = 'auto';
                 icon.style.cursor = 'pointer';
-                icon.addEventListener('click', () => {
-                    const input = icon.closest('.date-wrapper')?.querySelector('input[type="date"]');
-                    if (input) { try { input.showPicker(); } catch(e) { input.focus(); } }
+                icon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (pickerOpen) {
+                        input.blur();
+                        pickerOpen = false;
+                    } else {
+                        try { input.showPicker(); pickerOpen = true; }
+                        catch(err) { input.focus(); }
+                    }
                 });
+                input.addEventListener('blur', () => { pickerOpen = false; });
+                input.addEventListener('change', () => { pickerOpen = false; });
             });
 
             $('filter-container').addEventListener('click', (e) => { 
