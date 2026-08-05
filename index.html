@@ -155,9 +155,9 @@
                     --sidebar-text: #f8fafc;
                     --sidebar-active: color-mix(in srgb, white 5%, transparent);
 
-                    & .form-group select { background-image: url('data:image/svg+xml;utf8,<svg fill="%239ca3af" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); }
+                    
                     & tbody tr:hover { background: color-mix(in srgb, var(--primary) 10%, transparent); }
-                    & input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+                    & .date-icon { stroke: #D1D5DB; }
                     & .custom-switch { background: #1e1b4b; box-shadow: inset 0 0.1875em 0.375em rgba(0,0,0,0.4); }
                     & .switch-circle { transform: translateX(2em); }
                     & .icon-sun { opacity: 0; transform: scale(0.4) rotate(90deg) translateY(1.25em); }
@@ -168,7 +168,6 @@
                 * { 
                     box-sizing: border-box; margin: 0; padding: 0; 
                     scrollbar-width: none; 
-                    -ms-overflow-style: none; 
                 }
                 *::-webkit-scrollbar { display: none;  }
                 html, body { width: 100vw; overflow-x: hidden; }
@@ -294,12 +293,7 @@
                         width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text-main); font-family: inherit; font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s; 
                         &:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent); }
                     }
-                    & select {
-                        appearance: none; -webkit-appearance: none; -moz-appearance: none;
-                        background-image: url('data:image/svg+xml;utf8,<svg fill="%236b7280" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-                        background-repeat: no-repeat; background-position: right 12px center; padding-right: 40px;
-                        & option { background-color: var(--card-bg); color: var(--text-main); }
-                    }
+                    & select { display: none !important; }
                 }
 
                 input[type="number"]::-webkit-outer-spin-button,
@@ -348,7 +342,7 @@
                 .filter-btn { padding: 6px 16px; border-radius: 20px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; white-space: nowrap; }
                 .filter-btn.active { background: var(--card-bg); color: var(--text-main); box-shadow: var(--shadow-sm); }
                 
-                .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; border: 1px solid var(--border); max-height: 400px; }
+                .table-responsive { width: 100%; overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); max-height: 400px; }
                 table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: center; background: var(--card-bg); }
                 th, td { padding: 18px 24px; border-bottom: 1px solid var(--border); white-space: nowrap; font-size: 0.95rem; vertical-align: middle; text-align: center; }
                 th { color: var(--text-muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; background: color-mix(in srgb, var(--card-bg) 95%, transparent); position: sticky; top: 0; z-index: 10; backdrop-filter: blur(8px); }
@@ -391,7 +385,7 @@
                     }
 
                     & .form-group label { color: #9ca3af; }
-                    & :is(input, select) {
+                    & input {
                         background: color-mix(in srgb, white 5%, transparent) !important;
                         color: #f9fafb !important;
                         border: 1px solid color-mix(in srgb, white 10%, transparent) !important;
@@ -401,23 +395,73 @@
                             box-shadow: 0 0 0 3px color-mix(in srgb, #8b5cf6 20%, transparent) !important;
                         }
                     }
-                    & select {
-                        -webkit-appearance: none; -moz-appearance: none; appearance: none;
-                        background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%239CA3AF" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>');
-                        background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; cursor: pointer;
-                    }
-                    & input[type="date"] {
-                        position: relative;
-                        &::-webkit-calendar-picker-indicator {
-                            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-                            width: 100%; height: 100%; opacity: 0; cursor: pointer;
-                        }
-                    }
+                    & select { display: none !important; }
 
-                    @supports (appearance: base-select) {
-                        & select, & select::picker(select) { appearance: base-select; }
-                        & select::picker(select) { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow-sm); color: var(--text-main); }
+                    .custom-select-ui {
+                        position: relative; width: 100%;
                     }
+                    .select-selected {
+                        background: color-mix(in srgb, white 5%, transparent);
+                        color: #f9fafb;
+                        padding: 12px 16px;
+                        border: 1px solid color-mix(in srgb, white 10%, transparent);
+                        border-radius: 12px;
+                        cursor: pointer;
+                        user-select: none;
+                        display: flex; justify-content: space-between; align-items: center;
+                        transition: border-color 0.3s, box-shadow 0.3s;
+                    }
+                    .select-selected:hover { border-color: #8b5cf6; }
+                    .select-arrow-active { border-color: #8b5cf6 !important; box-shadow: 0 0 0 3px color-mix(in srgb, #8b5cf6 20%, transparent) !important; }
+                    .select-selected::after {
+                        content: ""; width: 18px; height: 18px; flex-shrink: 0;
+                        background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%239CA3AF" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>');
+                        background-size: contain; background-repeat: no-repeat; background-position: center;
+                        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                    }
+                    .select-arrow-active::after { transform: rotate(180deg); }
+
+                    .select-items {
+                        position: absolute;
+                        background: var(--card-bg, #1f2937);
+                        top: calc(100% + 6px); left: 0; right: 0;
+                        z-index: 99999;
+                        border-radius: 12px;
+                        box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px color-mix(in srgb, white 10%, transparent);
+                        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+                        overflow: hidden;
+                    }
+                    .select-hide { display: none !important; }
+                    .select-items div {
+                        padding: 11px 16px;
+                        cursor: pointer;
+                        color: #e5e7eb;
+                        transition: background 0.2s, padding-left 0.2s, color 0.2s;
+                        border-bottom: 1px solid color-mix(in srgb, white 5%, transparent);
+                    }
+                    .select-items div:last-child { border-bottom: none; }
+                    .select-items div:not(.same-as-selected):hover { background: color-mix(in srgb, #8b5cf6 15%, transparent); padding-left: 22px; color: #c4b5fd; }
+                    .same-as-selected { background: color-mix(in srgb, #8b5cf6 12%, transparent); font-weight: 600; color: #a78bfa; }
+                    .select-items:hover .same-as-selected:not(:hover) { background: transparent; font-weight: normal; color: #e5e7eb; }
+                    .same-as-selected:hover { background: color-mix(in srgb, #8b5cf6 18%, transparent) !important; color: #a78bfa !important; font-weight: 600 !important; }
+
+                    .date-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
+                    .date-wrapper input[type="date"] { width: 100%; padding-right: 44px; cursor: text; }
+                    .date-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+                        position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+                        width: 30px; height: 30px;
+                        opacity: 0; cursor: pointer;
+                        margin: 0; padding: 0;
+                        z-index: 10;
+                    }
+                    .date-icon {
+                        position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+                        width: 20px; height: 20px;
+                        pointer-events: none; z-index: 5;
+                        stroke: #9CA3AF; transition: stroke 0.3s; cursor: pointer;
+                    }
+                    .date-wrapper:hover .date-icon,
+                    .date-wrapper input:focus + .date-icon { stroke: #8b5cf6; }
 
                     & .btn-primary { 
                         background: #8b5cf6; border-radius: 12px; 
@@ -815,7 +859,7 @@
                         <div class="form-group"><label for="tx-desc">Description</label><input type="text" id="tx-desc" required placeholder="e.g. Amazon, Salary"></div>
                         <div class="form-grid">
                             <div class="form-group"><label for="tx-amount">Amount</label><input type="number" id="tx-amount" min="0.01" step="0.01" required></div>
-                            <div class="form-group"><label for="tx-date">Date</label><input type="date" id="tx-date" required></div>
+                            <div class="form-group"><label for="tx-date">Date</label><div class="date-wrapper"><input type="date" id="tx-date" required><svg class="date-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"></rect><line x1="16" y1="2" x2="16" y2="6" stroke-linecap="round" stroke-linejoin="round"></line><line x1="8" y1="2" x2="8" y2="6" stroke-linecap="round" stroke-linejoin="round"></line><line x1="3" y1="10" x2="21" y2="10" stroke-linecap="round" stroke-linejoin="round"></line></svg></div></div>
                         </div>
                         <div class="form-group"><label for="tx-category">Category</label><select id="tx-category" required><option value="">Select</option><option value="Salary">Salary</option><option value="Food">Food</option><option value="Shopping">Shopping</option><option value="Other">Other</option></select></div>
                         <div class="modal-actions">
@@ -986,12 +1030,14 @@
             
             $('tx-form').addEventListener('submit', addTransaction);
 
-            document.querySelectorAll('select').forEach(sel => {
-                sel.addEventListener('mousedown', function(e) {
-                    if (this === document.activeElement) {
-                        this.blur();
-                        e.preventDefault();
-                    }
+            initCustomSelects();
+
+            document.querySelectorAll('.date-wrapper .date-icon').forEach(icon => {
+                icon.style.pointerEvents = 'auto';
+                icon.style.cursor = 'pointer';
+                icon.addEventListener('click', () => {
+                    const input = icon.closest('.date-wrapper')?.querySelector('input[type="date"]');
+                    if (input) { try { input.showPicker(); } catch(e) { input.focus(); } }
                 });
             });
 
@@ -1020,52 +1066,53 @@
 
         function initCustomSelects() {
             document.querySelectorAll('select').forEach(sel => {
-                if (sel.nextElementSibling && sel.nextElementSibling.classList.contains('custom-select-ui')) return;
-                sel.style.display = 'none'; 
+                if (sel.dataset.customized) return;
+                sel.dataset.customized = 'true';
+                sel.style.display = 'none';
                 const wrapper = document.createElement('div');
                 wrapper.className = 'custom-select-ui';
-                const selectedDiv = document.createElement('div');
-                selectedDiv.className = 'select-selected';
-                selectedDiv.innerHTML = sel.options[sel.selectedIndex].innerHTML;
-                const optionsContainer = document.createElement('div');
-                optionsContainer.className = 'select-items select-hide';
-                Array.from(sel.options).forEach((opt, index) => {
-                    const optionDiv = document.createElement('div');
-                    optionDiv.innerHTML = opt.innerHTML;
-                    if (index === sel.selectedIndex) optionDiv.classList.add('same-as-selected');
-                    optionDiv.addEventListener('click', function(e) {
-                        sel.selectedIndex = index;
-                        selectedDiv.innerHTML = this.innerHTML;
+                const trigger = document.createElement('div');
+                trigger.className = 'select-selected';
+                trigger.textContent = sel.options[sel.selectedIndex]?.text || 'Select';
+                const menu = document.createElement('div');
+                menu.className = 'select-items select-hide';
+                Array.from(sel.options).forEach((opt, i) => {
+                    const item = document.createElement('div');
+                    item.textContent = opt.text;
+                    if (i === sel.selectedIndex) item.classList.add('same-as-selected');
+                    item.addEventListener('click', e => {
+                        e.stopPropagation();
+                        sel.selectedIndex = i;
+                        trigger.textContent = opt.text;
                         sel.dispatchEvent(new Event('change'));
-                        const same = this.parentNode.querySelectorAll('.same-as-selected');
-                        same.forEach(s => s.classList.remove('same-as-selected'));
-                        this.classList.add('same-as-selected');
-                        selectedDiv.click();
+                        menu.querySelectorAll('.same-as-selected').forEach(s => s.classList.remove('same-as-selected'));
+                        item.classList.add('same-as-selected');
+                        menu.classList.add('select-hide');
+                        trigger.classList.remove('select-arrow-active');
                     });
-                    optionsContainer.appendChild(optionDiv);
+                    menu.appendChild(item);
                 });
-                wrapper.appendChild(selectedDiv);
-                wrapper.appendChild(optionsContainer);
+                wrapper.appendChild(trigger);
+                wrapper.appendChild(menu);
                 sel.parentNode.insertBefore(wrapper, sel.nextSibling);
-                selectedDiv.addEventListener('click', function(e) {
+                trigger.addEventListener('click', e => {
                     e.stopPropagation();
-                    closeAllSelect(this);
-                    this.nextSibling.classList.toggle('select-hide');
-                    this.classList.toggle('select-arrow-active');
+                    const wasHidden = menu.classList.contains('select-hide');
+                    closeAllCustomSelects();
+                    if (wasHidden) {
+                        menu.classList.remove('select-hide');
+                        trigger.classList.add('select-arrow-active');
+                    }
                 });
             });
         }
-        function closeAllSelect(elmnt) {
-            const items = document.querySelectorAll('.select-items');
-            const selected = document.querySelectorAll('.select-selected');
-            selected.forEach((sel, i) => {
-                if (elmnt !== sel) {
-                    sel.classList.remove('select-arrow-active');
-                    items[i].classList.add('select-hide');
-                }
-            });
+        function closeAllCustomSelects() {
+            document.querySelectorAll('.select-items').forEach(m => m.classList.add('select-hide'));
+            document.querySelectorAll('.select-selected').forEach(t => t.classList.remove('select-arrow-active'));
         }
-        document.addEventListener('click', closeAllSelect);
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.custom-select-ui')) closeAllCustomSelects();
+        });
 
         function handleRegister(e) {
             e.preventDefault();
@@ -1345,4 +1392,7 @@
         initApp();
     </script>
 </body>
-</html>
+</html>
+
+
+
