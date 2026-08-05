@@ -1256,7 +1256,7 @@
             const tbody = $('tx-tbody');
             const filtered = AppState.activeFilter === 'All' ? txs : txs.filter(t => t.type === AppState.activeFilter);
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 48px 24px; color: var(--text-muted); font-size: 0.95rem; background: transparent; box-shadow: none;">No transactions found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="display: table-cell; text-align: center; vertical-align: middle; padding: 48px 24px; color: var(--text-muted); font-size: 0.95rem; background: transparent; box-shadow: none; border: none;">No transactions found.</td></tr>`;
             } else {
                 tbody.innerHTML = filtered.sort((a,b) => new Date(b.date) - new Date(a.date)).map(tx => {
                     const isInc = tx.type === 'Income';
@@ -1366,8 +1366,7 @@
             const user = getCurrentUser(); if(!user) return; 
             user.settings.dark = !user.settings.dark; 
             saveUsers(); 
-            applySettings(); 
-            if(AppState.chartInstance) masterRefresh(); 
+            location.reload(); 
         }
 
         function saveSettings(e) { 
