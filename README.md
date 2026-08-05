@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="images/banner.jpg?v=639215302394048964" alt="FinTrack Pro Banner" width="100%" style="border-radius: 16px; box-shadow: 0 12px 24px rgba(0,0,0,0.3);">
+  <img src="images/banner.webp?v=639215306855691943" alt="FinTrack Pro Banner" width="100%" style="border-radius: 16px; box-shadow: 0 12px 24px rgba(0,0,0,0.3);">
 
   <br />
   
