@@ -454,6 +454,7 @@
                         width: 20px; height: 20px;
                         pointer-events: none; z-index: 5;
                         stroke: var(--text-muted); transition: stroke 0.3s; cursor: pointer;
+                        -webkit-user-select: none; user-select: none;
                     }
                     .date-wrapper:hover .date-icon,
                     .date-wrapper input:focus + .date-icon { stroke: var(--primary); }
@@ -1034,8 +1035,10 @@
                 let pickerOpen = false;
                 icon.style.pointerEvents = 'auto';
                 icon.style.cursor = 'pointer';
+                icon.addEventListener('pointerdown', (e) => e.preventDefault());
                 icon.addEventListener('click', (e) => {
                     e.stopPropagation();
+                    e.preventDefault();
                     if (pickerOpen) {
                         input.blur();
                         pickerOpen = false;
