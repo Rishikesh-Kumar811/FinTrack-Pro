@@ -5,10 +5,10 @@
   <p><strong>The Next-Generation Premium Personal Finance & Expense Tracker</strong></p>
 
   <p>
-    <img src="https://img.shields.io/badge/Version-1.1.0-4f46e5?style=for-the-badge&logo=appveyor" alt="Version" />
-    <img src="https://img.shields.io/badge/Tech_Stack-ES2026%20%7C%20CSS_Nesting-10b981?style=for-the-badge&logo=javascript" alt="Tech Stack" />
-    <img src="https://img.shields.io/badge/Performance-Blazing_Fast-ef4444?style=for-the-badge&logo=speedtest" alt="Performance" />
-    <img src="https://img.shields.io/badge/UI/UX-Glassmorphism-8b5cf6?style=for-the-badge&logo=figma" alt="UI/UX" />
+    <img src="https://img.shields.io/badge/Version-1.1.0-4f46e5?style=flat&logo=appveyor" alt="Version" />
+    <img src="https://img.shields.io/badge/Tech_Stack-ES2026%20%7C%20CSS_Nesting-10b981?style=flat&logo=javascript" alt="Tech Stack" />
+    <img src="https://img.shields.io/badge/Performance-Blazing_Fast-ef4444?style=flat&logo=speedtest" alt="Performance" />
+    <img src="https://img.shields.io/badge/UI/UX-Glassmorphism-8b5cf6?style=flat&logo=figma" alt="UI/UX" />
   </p>
 
 </div>
