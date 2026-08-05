@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="file:///C:/Users/rishi/.gemini/antigravity/brain/34237269-957e-4732-ad8b-1f54e484171d/fintrack_pro_banner_1785660088323.jpg" alt="FinTrack Pro Banner" width="100%" style="border-radius: 16px; box-shadow: 0 12px 24px rgba(0,0,0,0.3);">
+  <img src="images/banner.jpg" alt="FinTrack Pro Banner" width="100%" style="border-radius: 16px; box-shadow: 0 12px 24px rgba(0,0,0,0.3);">
 
   <br />
   
@@ -8,7 +8,6 @@
 
   <p>
     <img src="https://img.shields.io/badge/Version-1.1.0-4f46e5?style=for-the-badge&logo=appveyor" alt="Version" />
-    <img src="https://img.shields.io/badge/Lighthouse-100%2F100%2F100%2F100-success?style=for-the-badge&logo=googlechrome" alt="Lighthouse Perfect Score" />
     <img src="https://img.shields.io/badge/Tech_Stack-ES2026%20%7C%20CSS_Nesting-10b981?style=for-the-badge&logo=javascript" alt="Tech Stack" />
     <img src="https://img.shields.io/badge/Performance-Blazing_Fast-ef4444?style=for-the-badge&logo=speedtest" alt="Performance" />
     <img src="https://img.shields.io/badge/UI/UX-Glassmorphism-8b5cf6?style=for-the-badge&logo=figma" alt="UI/UX" />
