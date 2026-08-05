@@ -1,6 +1,4 @@
 <div align="center">
-  <img src="images/banner.webp?v=639215306855691943" alt="FinTrack Pro Banner" width="100%" style="border-radius: 16px; box-shadow: 0 12px 24px rgba(0,0,0,0.3);">
-
   <br />
   
   <h1>✨ FinTrack Pro ✨</h1>
