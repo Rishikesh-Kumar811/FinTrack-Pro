@@ -157,7 +157,6 @@
 
                     
                     & tbody tr:hover { background: color-mix(in srgb, var(--primary) 10%, transparent); }
-                    & .date-icon { stroke: #D1D5DB; }
                     & .custom-switch { background: #1e1b4b; box-shadow: inset 0 0.1875em 0.375em rgba(0,0,0,0.4); }
                     & .switch-circle { transform: translateX(2em); }
                     & .icon-sun { opacity: 0; transform: scale(0.4) rotate(90deg) translateY(1.25em); }
@@ -355,14 +354,14 @@
                 .badge-expense { background: color-mix(in srgb, var(--expense) 15%, transparent); color: var(--expense); }
 
                 dialog.modal {
-                    background: #111827; 
-                    color: #f9fafb;
+                    background: var(--card-bg); 
+                    color: var(--text-main);
                     width: calc(100% - 32px); 
                     max-width: 440px; 
                     padding: clamp(20px, 5vw, 32px); 
                     border-radius: 16px; 
                     box-shadow: var(--shadow-lg); 
-                    border: 1px solid color-mix(in srgb, white 10%, transparent); 
+                    border: 1px solid var(--border); 
                     margin: auto;
                     transition: background 0.4s, border-color 0.4s, display 0.4s allow-discrete, overlay 0.4s allow-discrete, opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                     opacity: 1;
@@ -384,15 +383,15 @@
                         @starting-style { background-color: transparent; }
                     }
 
-                    & .form-group label { color: #9ca3af; }
+                    & .form-group label { color: var(--text-muted); }
                     & input {
-                        background: color-mix(in srgb, white 5%, transparent) !important;
-                        color: #f9fafb !important;
-                        border: 1px solid color-mix(in srgb, white 10%, transparent) !important;
+                        background: var(--bg) !important;
+                        color: var(--text-main) !important;
+                        border: 1px solid var(--border) !important;
                         border-radius: 12px;
                         &:focus {
-                            border-color: #8b5cf6 !important;
-                            box-shadow: 0 0 0 3px color-mix(in srgb, #8b5cf6 20%, transparent) !important;
+                            border-color: var(--primary) !important;
+                            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent) !important;
                         }
                     }
                     & select { display: none !important; }
@@ -401,18 +400,18 @@
                         position: relative; width: 100%;
                     }
                     .select-selected {
-                        background: color-mix(in srgb, white 5%, transparent);
-                        color: #f9fafb;
+                        background: var(--bg);
+                        color: var(--text-main);
                         padding: 12px 16px;
-                        border: 1px solid color-mix(in srgb, white 10%, transparent);
+                        border: 1px solid var(--border);
                         border-radius: 12px;
                         cursor: pointer;
                         user-select: none;
                         display: flex; justify-content: space-between; align-items: center;
                         transition: border-color 0.3s, box-shadow 0.3s;
                     }
-                    .select-selected:hover { border-color: #8b5cf6; }
-                    .select-arrow-active { border-color: #8b5cf6 !important; box-shadow: 0 0 0 3px color-mix(in srgb, #8b5cf6 20%, transparent) !important; }
+                    .select-selected:hover { border-color: var(--primary); }
+                    .select-arrow-active { border-color: var(--primary) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent) !important; }
                     .select-selected::after {
                         content: ""; width: 18px; height: 18px; flex-shrink: 0;
                         background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%239CA3AF" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>');
@@ -423,11 +422,11 @@
 
                     .select-items {
                         position: absolute;
-                        background: var(--card-bg, #1f2937);
+                        background: var(--card-bg);
                         top: calc(100% + 6px); left: 0; right: 0;
                         z-index: 99999;
                         border-radius: 12px;
-                        box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px color-mix(in srgb, white 10%, transparent);
+                        box-shadow: 0 12px 40px rgba(0,0,0,0.15), 0 0 0 1px var(--border);
                         backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
                         overflow: hidden;
                     }
@@ -435,15 +434,15 @@
                     .select-items div {
                         padding: 11px 16px;
                         cursor: pointer;
-                        color: #e5e7eb;
+                        color: var(--text-main);
                         transition: background 0.2s, padding-left 0.2s, color 0.2s;
-                        border-bottom: 1px solid color-mix(in srgb, white 5%, transparent);
+                        border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
                     }
                     .select-items div:last-child { border-bottom: none; }
-                    .select-items div:not(.same-as-selected):hover { background: color-mix(in srgb, #8b5cf6 15%, transparent); padding-left: 22px; color: #c4b5fd; }
-                    .same-as-selected { background: color-mix(in srgb, #8b5cf6 12%, transparent); font-weight: 600; color: #a78bfa; }
-                    .select-items:hover .same-as-selected:not(:hover) { background: transparent; font-weight: normal; color: #e5e7eb; }
-                    .same-as-selected:hover { background: color-mix(in srgb, #8b5cf6 18%, transparent) !important; color: #a78bfa !important; font-weight: 600 !important; }
+                    .select-items div:not(.same-as-selected):hover { background: color-mix(in srgb, var(--primary) 12%, transparent); padding-left: 22px; color: var(--primary); }
+                    .same-as-selected { background: color-mix(in srgb, var(--primary) 10%, transparent); font-weight: 600; color: var(--primary); }
+                    .select-items:hover .same-as-selected:not(:hover) { background: transparent; font-weight: normal; color: var(--text-main); }
+                    .same-as-selected:hover { background: color-mix(in srgb, var(--primary) 15%, transparent) !important; color: var(--primary) !important; font-weight: 600 !important; }
 
                     .date-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
                     .date-wrapper input[type="date"] { width: 100%; padding-right: 44px; cursor: text; }
@@ -458,26 +457,26 @@
                         position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
                         width: 20px; height: 20px;
                         pointer-events: none; z-index: 5;
-                        stroke: #9CA3AF; transition: stroke 0.3s; cursor: pointer;
+                        stroke: var(--text-muted); transition: stroke 0.3s; cursor: pointer;
                     }
                     .date-wrapper:hover .date-icon,
-                    .date-wrapper input:focus + .date-icon { stroke: #8b5cf6; }
+                    .date-wrapper input:focus + .date-icon { stroke: var(--primary); }
 
                     & .btn-primary { 
-                        background: #8b5cf6; border-radius: 12px; 
-                        &:hover:not(:disabled) { background: #7c3aed; }
+                        background: var(--primary); border-radius: 12px; 
+                        &:hover:not(:disabled) { background: var(--primary-hover); }
                     }
                     & .btn-outline { 
-                        background: transparent; border: 1px solid color-mix(in srgb, white 20%, transparent); color: #f9fafb; border-radius: 12px; 
-                        &:hover { background: color-mix(in srgb, white 10%, transparent); }
+                        background: transparent; border: 1px solid var(--border); color: var(--text-main); border-radius: 12px; 
+                        &:hover { background: color-mix(in srgb, var(--primary) 8%, transparent); }
                     }
                 }
                 
                 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
                 .modal-header h2 { font-size: 1.25rem; font-weight: 600; }
-                .close-dialog-btn { background: none; border: none; outline: none; font-size: 1.5rem; color: #9ca3af; cursor: pointer; transition: color 0.2s; }
-                .close-dialog-btn:focus-visible { outline: 2px solid #8b5cf6; border-radius: 6px; }
-                .close-dialog-btn:hover { color: #f9fafb; }
+                .close-dialog-btn { background: none; border: none; outline: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; transition: color 0.2s; }
+                .close-dialog-btn:focus-visible { outline: 2px solid var(--primary); border-radius: 6px; }
+                .close-dialog-btn:hover { color: var(--text-main); }
                 .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; }
 
                 .settings-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
@@ -565,7 +564,7 @@
                     .content-area { 
                         grid-area: content; 
                         padding: 24px 20px 40px 20px; 
-                        background: var(--bg-main); 
+                        background: var(--bg); 
                         border-top-left-radius: 24px;
                         border-top-right-radius: 24px;
                         overflow-y: auto; 
