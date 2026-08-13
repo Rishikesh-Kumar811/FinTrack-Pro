@@ -2,7 +2,7 @@
 
 <br/>
 
-# 💰 FinTrack Pro
+<h1>💰 FinTrack Pro</h1>
 
 ### Zero-Dependency Personal Finance Tracker
 
