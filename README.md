@@ -32,7 +32,7 @@ A premium personal finance application built entirely with Vanilla JavaScript �
 
 <br/>
 
-<h3 align="center">✨ Features</h3>
+<h2 align="center">✨ Features</h2>
 
 | 🎯 Core Feature | ✨ Technical Implementation |
 | :--- | :--- |
