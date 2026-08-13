@@ -14,11 +14,15 @@ A premium personal finance application built entirely with Vanilla JavaScript �
 
 </div>
 
+<br/>
+
 <h2 align="center">🛠️ Tech Stack</h2>
 
 <p align="center">
   <img src="https://skillicons.dev/icons?i=html,css,js" alt="Tech Stack" />
 </p>
+
+<br/>
 
 <h2 align="center">✨ Features</h2>
 
@@ -31,9 +35,13 @@ A premium personal finance application built entirely with Vanilla JavaScript �
 | 📱 **Responsive Card Transform** | Table data auto-transforms into stacked mobile cards at `768px` breakpoint |
 | 💾 **Multi-Tenant LocalStorage** | Isolated data collections (`fintrack_users`, `fintrack_session`, `fintrack_tx`) per user |
 
+<br/>
+
 <h2 align="center">🏗️ Architecture</h2>
 
 > Single-file Vanilla SPA architecture with modular JS state object (`AppState`), stateful UI build function, and dynamic view switching — zero build tools required.
+
+<br/>
 
 <h2 align="center">🚀 Quick Start</h2>
 
@@ -44,6 +52,8 @@ git clone https://github.com/Rishikesh-Kumar811/FinTrack-Pro.git
 # Open in browser
 cd FinTrack-Pro && open index.html
 \`\`\`
+
+<br/>
 
 <div align="center">
 
