@@ -13,9 +13,9 @@ A premium personal finance application built entirely with Vanilla JavaScript �
 <br/>
 
 <p align="center">
-  <a href="https://fintrack-rishi.vercel.app"><img src="https://img.shields.io/badge/▶_LIVE_DEMO-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" /></a>&nbsp;
-  <a href="https://github.com/Rishikesh-Kumar811/FinTrack-Pro/issues"><img src="https://img.shields.io/badge/🐛_REPORT_BUG-FF4444?style=for-the-badge" alt="Report Bug" /></a>&nbsp;
-  <a href="https://github.com/Rishikesh-Kumar811/FinTrack-Pro/issues"><img src="https://img.shields.io/badge/✨_REQUEST_FEATURE-8B5CF6?style=for-the-badge" alt="Request Feature" /></a>
+  <a href="https://fintrack-rishi.vercel.app"><img src="https://badgen.net/badge/▶%20LIVE%20DEMO/%20/000?icon=vercel&labelColor=000" alt="Live Demo" height="32" /></a>&nbsp;&nbsp;
+  <a href="https://github.com/Rishikesh-Kumar811/FinTrack-Pro/issues"><img src="https://badgen.net/badge/REPORT%20BUG/%20/e11d48?labelColor=e11d48" alt="Report Bug" height="32" /></a>&nbsp;&nbsp;
+  <a href="https://github.com/Rishikesh-Kumar811/FinTrack-Pro/issues"><img src="https://badgen.net/badge/REQUEST%20FEATURE/%20/8B5CF6?labelColor=8B5CF6" alt="Request Feature" height="32" /></a>
 </p>
 
 </div>
@@ -65,6 +65,6 @@ cd FinTrack-Pro && open index.html
 
 <br/>
 
-<img src="https://img.shields.io/badge/BUILT_WITH-❤️-ff69b4?style=for-the-badge" alt="Built with Love" />
+<img src="https://badgen.net/badge/Built%20with/♥%20Love/ff69b4?labelColor=ff69b4" alt="Built with Love" height="28" />
 
 </div>
