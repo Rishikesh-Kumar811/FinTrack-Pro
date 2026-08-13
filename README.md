@@ -6,10 +6,9 @@
   <br />
 
   <div align="center">
-    <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white" alt="Vite" height="30" /> &nbsp;
-    <img src="https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB" alt="React" height="30" /> &nbsp;
-    <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white" alt="TailwindCSS" height="30" /> &nbsp;
-    <img src="https://img.shields.io/badge/JavaScript-323330?style=flat&logo=javascript&logoColor=F7DF1E" alt="JavaScript" height="30" />
+    <img src="https://badgen.net/badge/icon/HTML5?icon=html5&color=E34F26" alt="HTML5" height="28" /> &nbsp;
+    <img src="https://badgen.net/badge/icon/CSS3?icon=css3&color=1572B6" alt="CSS3" height="28" /> &nbsp;
+    <img src="https://badgen.net/badge/icon/JavaScript?icon=javascript&color=323330" alt="JavaScript" height="28" />
   </div>
   
 </div>
@@ -26,14 +25,14 @@
 ## ✨ Key Features & UI/UX Highlights
 This repository is built with a strict focus on modern web standards, beautiful responsive design, and high performance.
 
-- **Real-Time State Management**: Utilizes React Hooks (`useState`, `useContext`) for instant UI updates across independent components.
+- **Lightweight Vanilla Architecture**: Built entirely with Vanilla JavaScript, HTML5, and CSS3, demonstrating strong foundational engineering without heavy framework dependencies.
 - **Premium UI/UX**: Features glassmorphism, soft gradients, and rounded layouts (4px border-radius) for a highly polished, modern aesthetic.
 - **Dynamic Data Visualization**: Seamless rendering of financial data and transaction history with clean, responsive lists.
-- **Local Storage Sync**: Persists user data locally ensuring zero data loss upon refresh.
+- **DOM Manipulation Mastery**: Efficient client-side rendering and state updates achieved through pure JavaScript Event Delegation and direct DOM updates.
 
 ## 🧠 Architecture & Technical Logic
 **Why this stack?**  
-Architected as a Single Page Application (SPA) using Vite for sub-second HMR. The UI logic strictly separates presentational components from stateful container logic, ensuring scalability. Tailwind CSS is used extensively to enforce a strict design token system.
+Architected as a Single Page Application (SPA) natively. The UI logic strictly separates presentational HTML from stateful JS logic, ensuring scalability and lightning-fast load times.
 
 The project emphasizes a clean directory structure, separation of concerns, and maintainable styles, serving as a testament to scalable frontend engineering.
 
@@ -62,5 +61,5 @@ npm run dev
 <div align="center">
   <i>Engineered with focus and precision.</i> <br/>
   <br/>
-  <img src="https://img.shields.io/badge/Built_with-Love-ff69b4?style=flat" height="32" />
+  <img src="https://badgen.net/badge/Built%20with/Love/ff69b4?icon=heart" height="28" />
 </div>
