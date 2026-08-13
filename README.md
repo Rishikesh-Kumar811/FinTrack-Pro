@@ -34,12 +34,14 @@ A premium personal finance application built entirely with Vanilla JavaScript �
 
 <h2 align="center">✨ Features</h2>
 
-- 📊 **Chart.js Data Visualization** — Dynamic pie/bar charts loaded from jsDelivr CDN for expense breakdown analytics
-- 🔐 **Client-Side Auth System** — Sign-up with real-time password strength validation, login sessions & per-user data isolation
-- 🌗 **Custom SVG Day/Night Toggle** — Animated theme switcher with cloud and star SVG particle animations
-- ✨ **View Transitions API** — Smooth native page transition effects using `::view-transition-old/new` pseudo-elements
-- 📱 **Responsive Card Transform** — Table data auto-transforms into stacked mobile cards at `768px` breakpoint
-- 💾 **Multi-Tenant LocalStorage** — Isolated data collections (`fintrack_users`, `fintrack_session`, `fintrack_tx`) per user
+| 🎯 Core Feature | ✨ Technical Implementation |
+| :--- | :--- |
+| 📊 **Chart.js Data Visualization** | Dynamic pie/bar charts loaded from jsDelivr CDN for expense breakdown analytics |
+| 🔐 **Client-Side Auth System** | Sign-up with real-time password strength validation, login sessions & per-user data isolation |
+| 🌗 **Custom SVG Day/Night Toggle** | Animated theme switcher with cloud and star SVG particle animations |
+| ✨ **View Transitions API** | Smooth native page transition effects using `::view-transition-old/new` pseudo-elements |
+| 📱 **Responsive Card Transform** | Table data auto-transforms into stacked mobile cards at `768px` breakpoint |
+| 💾 **Multi-Tenant LocalStorage** | Isolated data collections (`fintrack_users`, `fintrack_session`, `fintrack_tx`) per user |
 
 <br/>
 
