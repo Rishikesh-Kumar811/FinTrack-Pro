@@ -1,46 +1,34 @@
 <div align="center">
+  <img src="https://badgen.net/badge/-/FinTrack%20Pro/4f46e5?scale=2.5&label=" alt="Banner Badge" />
+  
   <br />
-  <h1>✨ FinTrack Pro ✨</h1>
-  <p><strong>A Lightweight, Client-Side Personal Finance Tracker</strong></p>
+  <br />
 
-  <p>
-    <img src="https://img.shields.io/badge/Version-1.1.0-4f46e5?style=flat&logo=appveyor" alt="Version" />
-    <img src="https://img.shields.io/badge/Tech_Stack-Vanilla_JS%20%7C%20HTML5%20%7C%20CSS3-10b981?style=flat&logo=javascript" alt="Tech Stack" />
-    <img src="https://img.shields.io/badge/Storage-Local_Storage-ef4444?style=flat&logo=html5" alt="Storage" />
-  </p>
+  # 🌟 FinTrack Pro
+  **Next-Generation Premium Personal Finance Tracker.** <br/>
+  Manage your expenses and track your financial goals with this beautifully designed, high-performance web app.
+  
+  <br />
+
+  <img src="https://badgen.net/badge/-/HTML5?icon=html5&color=E34F26&scale=1.5&label=" /> &nbsp;
+  <img src="https://badgen.net/badge/-/CSS3?icon=css3&color=1572B6&scale=1.5&label=" /> &nbsp;
+  <img src="https://badgen.net/badge/-/JavaScript?icon=javascript&color=F7DF1E&scale=1.5&label=" />
+  
 </div>
 
 ---
 
-## 🚀 Overview
+## ✨ Overview
+This repository contains the source code for **FinTrack Pro**. It is built with a strict focus on modern web standards, beautiful responsive design, and high performance.
 
-**FinTrack Pro** is a meticulously crafted, single-file (index.html) web application built entirely with vanilla web technologies. It is designed to give you complete control over your cash flow without the overhead of heavy frameworks or complex backend servers.
-
-> [!NOTE]
-> Based on a direct analysis of the codebase, this application operates **100% on the client side**. All data logic—including user sessions, transactions, and theme preferences—is managed using Vanilla JavaScript and stored securely in your browser's localStorage.
-
----
-
-## 💎 Features & Technical Analysis
-
-| ✨ Feature | 🔍 Implementation Details |
-| :--- | :--- |
-| **Zero Dependencies (Mostly)** | Built entirely with Vanilla JS, HTML5, and standard CSS. The only external library used is Chart.js for rendering financial data. |
-| **Client-Side Data Management** | Uses browser localStorage (intrack_users, intrack_tx, intrack_session) to simulate a full database and user authentication system locally. |
-| **Advanced Native CSS** | Utilizes Native CSS variables for theming, CSS nesting for clean structure, and cubic-bezier() animations for smooth UI interactions. |
-| **Modern View Transitions** | Leverages the native View Transitions API for snappy, app-like screen navigations. |
-| **Dark Mode Engine** | A custom-built dark mode toggle that updates native CSS variables (--bg, --text-main, --card-bg) dynamically via JavaScript. |
-
----
-
-## 🔐 Security & Privacy
-
-> [!IMPORTANT]  
-> Because FinTrack Pro relies entirely on localStorage, **your data never leaves your device**. There are no API calls to external databases, ensuring complete privacy for your financial records.
+## 🚀 Usage
+1. Clone the repository: `git clone https://github.com/Rishikesh-Kumar811/FinTrack-Pro.git`
+2. Open the project in your favorite IDE.
+3. Run the development server (or open `index.html` directly).
 
 ---
 
 <div align="center">
-  <i>Built with passion for clean code and native web capabilities.</i> <br>
-  <b>FinTrack Pro © 2026</b>
+  <i>Designed with focus and precision.</i> <br/>
+  <img src="https://badgen.net/badge/Built%20with/Love/ff69b4?scale=1.5" />
 </div>
