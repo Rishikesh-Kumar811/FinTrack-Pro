@@ -24,7 +24,7 @@ A premium personal finance application built entirely with Vanilla JavaScript �
 
 <br/>
 
-<h2 align="center">🛠️ Tech Stack</h2>
+<h3 align="center">🛠️ Tech Stack</h3>
 
 <p align="center">
   <img src="https://skillicons.dev/icons?i=html,css,js" alt="Tech Stack" />
@@ -32,7 +32,7 @@ A premium personal finance application built entirely with Vanilla JavaScript �
 
 <br/>
 
-<h2 align="center">✨ Features</h2>
+<h3 align="center">✨ Features</h3>
 
 | 🎯 Core Feature | ✨ Technical Implementation |
 | :--- | :--- |
@@ -45,13 +45,13 @@ A premium personal finance application built entirely with Vanilla JavaScript �
 
 <br/>
 
-<h2 align="center">🏗️ Architecture</h2>
+<h3 align="center">🏗️ Architecture</h3>
 
 > Single-file Vanilla SPA architecture with modular JS state object (`AppState`), stateful UI build function, and dynamic view switching — zero build tools required.
 
 <br/>
 
-<h2 align="center">🚀 Quick Start</h2>
+<h3 align="center">🚀 Quick Start</h3>
 
 \`\`\`bash
 # Clone the repository
